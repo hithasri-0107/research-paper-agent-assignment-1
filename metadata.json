@@ -1,0 +1,6 @@
+{
+  "name": "CS Paper Architecture & Opportunity Engine",
+  "description": "Advanced Computer Science Researcher Agent for parsing academic papers, extracting system architectures into Mermaid.js flowcharts, and generating resume-ready student extension projects.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
