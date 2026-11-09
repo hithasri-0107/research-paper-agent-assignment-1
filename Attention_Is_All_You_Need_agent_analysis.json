@@ -1,0 +1,95 @@
+{
+  "paperTitle": "Attention Is All You Need",
+  "authors": "Ashish Vaswani, Noam Shazeer, Niki Parmar, Jakob Uszkoreit, et al.",
+  "publicationAndYear": "NeurIPS 2017 (Advances in Neural Information Processing Systems 30) (2017)",
+  "publication": "NeurIPS 2017 (Advances in Neural Information Processing Systems 30)",
+  "year": "2017",
+  "citationCount": "135,000+",
+  "problemStatement": "Existing sequence transduction models relied heavily on complex recurrent or convolutional neural networks (RNNs/LSTMs), which process tokens sequentially. This sequential nature prevents parallelization across token positions during training, creating severe compute bottlenecks on long sequences and struggling to retain distant context.",
+  "methodology": "The authors introduce the Transformer, an architecture eschewing recurrence entirely in favor of stacked Multi-Head Self-Attention mechanisms. Both encoder and decoder blocks map sequence inputs to continuous representations entirely via dot-product attention paired with sinusoidal positional encodings, enabling complete GPU parallelization across all tokens simultaneously.",
+  "keyConcepts": [
+    "Multi-Head Self-Attention",
+    "Scaled Dot-Product Attention",
+    "Sinusoidal Positional Encodings",
+    "Transformer Encoder-Decoder Stacks",
+    "Residual Connections & Layer Normalization"
+  ],
+  "architectureFlowchart": {
+    "syntax": "mermaid",
+    "type": "graph TD",
+    "mermaidCode": "graph TD\n    InputTokens[\"Input Tokens (Src & Tgt)\"] --> Embed[\"Token Embeddings + Sinusoidal Positional Encoding\"]\n    Embed --> EncBlock[\"Encoder Stack (Nx Layers)\"]\n    \n    subgraph EncoderLayer [\"Encoder Layer\"]\n      EncBlock --> MultiHeadAttn[\"Multi-Head Self-Attention (Q, K, V)\"]\n      MultiHeadAttn --> AddNorm1[\"Add & LayerNorm\"]\n      AddNorm1 --> FeedForward[\"Position-wise Feed-Forward (FFN)\"]\n      FeedForward --> AddNorm2[\"Add & LayerNorm\"]\n    end\n    \n    AddNorm2 --> CrossAttention[\"Cross-Attention (Keys & Values from Encoder)\"]\n    \n    TgtTokens[\"Shifted Target Tokens\"] --> TgtEmbed[\"Target Embeddings + Positional Encoding\"]\n    TgtEmbed --> MaskedAttn[\"Masked Multi-Head Self-Attention\"]\n    MaskedAttn --> DecAddNorm1[\"Add & LayerNorm\"]\n    \n    subgraph DecoderLayer [\"Decoder Layer\"]\n      DecAddNorm1 --> CrossAttention\n      CrossAttention --> DecAddNorm2[\"Add & LayerNorm\"]\n      DecAddNorm2 --> DecFFN[\"Position-wise Feed-Forward (FFN)\"]\n      DecFFN --> DecAddNorm3[\"Add & LayerNorm\"]\n    end\n    \n    DecAddNorm3 --> Linear[\"Linear Projection\"]\n    Linear --> Softmax[\"Softmax Token Probabilities\"]\n    Softmax --> OutputTokens[\"Predicted Output Tokens\"]",
+    "flowchartLabeledText": "(FLOWCHART)\ngraph TD\n    InputTokens[\"Input Tokens (Src & Tgt)\"] --> Embed[\"Token Embeddings + Sinusoidal Positional Encoding\"]\n    Embed --> EncBlock[\"Encoder Stack (Nx Layers)\"]\n    \n    subgraph EncoderLayer [\"Encoder Layer\"]\n      EncBlock --> MultiHeadAttn[\"Multi-Head Self-Attention (Q, K, V)\"]\n      MultiHeadAttn --> AddNorm1[\"Add & LayerNorm\"]\n      AddNorm1 --> FeedForward[\"Position-wise Feed-Forward (FFN)\"]\n      FeedForward --> AddNorm2[\"Add & LayerNorm\"]\n    end\n    \n    AddNorm2 --> CrossAttention[\"Cross-Attention (Keys & Values from Encoder)\"]\n    \n    TgtTokens[\"Shifted Target Tokens\"] --> TgtEmbed[\"Target Embeddings + Positional Encoding\"]\n    TgtEmbed --> MaskedAttn[\"Masked Multi-Head Self-Attention\"]\n    MaskedAttn --> DecAddNorm1[\"Add & LayerNorm\"]\n    \n    subgraph DecoderLayer [\"Decoder Layer\"]\n      DecAddNorm1 --> CrossAttention\n      CrossAttention --> DecAddNorm2[\"Add & LayerNorm\"]\n      DecAddNorm2 --> DecFFN[\"Position-wise Feed-Forward (FFN)\"]\n      DecFFN --> DecAddNorm3[\"Add & LayerNorm\"]\n    end\n    \n    DecAddNorm3 --> Linear[\"Linear Projection\"]\n    Linear --> Softmax[\"Softmax Token Probabilities\"]\n    Softmax --> OutputTokens[\"Predicted Output Tokens\"]"
+  },
+  "threeFutureDevelopmentOpportunities": [
+    {
+      "opportunityNumber": 1,
+      "projectTitle": "Edge-Optimized Attention with FlashAttention & INT8 Quantization",
+      "exactExtension": "Replacing vanilla O(N^2) memory-bound attention with hardware-aware tiled FlashAttention and post-training dynamic INT8 weight quantization for edge deployment on low-memory micro-devices.",
+      "targetedPerformance": "Reduce peak GPU VRAM consumption by 65% and accelerate inference latency by 3.4x on sequence lengths >= 2048 with < 0.2 BLEU degradation.",
+      "recommendedTechStack": [
+        "PyTorch",
+        "FlashAttention-2",
+        "Triton",
+        "ONNX Runtime",
+        "HuggingFace Transformers"
+      ],
+      "implementationMilestones": [
+        "Milestone 1: Profile baseline PyTorch Transformer attention kernel memory footprint and memory access bottlenecks using PyTorch Profiler.",
+        "Milestone 2: Implement FlashAttention IO-aware tiling kernel integration, comparing SRAM vs HBM memory roundtrips.",
+        "Milestone 3: Apply post-training INT8 dynamic quantization and evaluate inference latency benchmarks on edge CPU/GPU."
+      ],
+      "resumeBulletPoint": "Engineered hardware-aware FlashAttention and INT8 quantization pipeline in PyTorch/Triton, slashing memory footprint by 65% and boosting inference throughput 3.4x on edge sequence lengths.",
+      "difficultyLevel": "Intermediate",
+      "estimatedWeeks": "3-4 weeks"
+    },
+    {
+      "opportunityNumber": 2,
+      "projectTitle": "Hybrid Mamba-Transformer Sequence Model for Sub-Quadratic Scaling",
+      "exactExtension": "Interleaving lightweight Mamba selective state-space model (SSM) blocks within Transformer layers, substituting 50% of self-attention heads with linear-time state space transitions.",
+      "targetedPerformance": "Achieve linear O(N) computational complexity during generation, cutting time-to-first-token by 42% on 8k context lengths while preserving language modeling perplexity.",
+      "recommendedTechStack": [
+        "PyTorch",
+        "Mamba (state-spaces/mamba)",
+        "HuggingFace Datasets",
+        "Weights & Biases"
+      ],
+      "implementationMilestones": [
+        "Milestone 1: Set up a modular PyTorch character/byte-level language model bench testing standard GPT-2 vs Mamba layers.",
+        "Milestone 2: Construct hybrid alternating architecture (1 Mamba block : 1 Attention block) and train on TinyStories/WikiText-103.",
+        "Milestone 3: Benchmark generation throughput across sequence lengths 512 through 8192, visualizing memory curves."
+      ],
+      "resumeBulletPoint": "Architected a hybrid Mamba-Transformer language model combining selective state-space blocks with attention, lowering long-context generation latency by 42% with linear memory scaling.",
+      "difficultyLevel": "Advanced",
+      "estimatedWeeks": "4-5 weeks"
+    },
+    {
+      "opportunityNumber": 3,
+      "projectTitle": "Rotary Position Embedding (RoPE) & Context Extension Engine",
+      "exactExtension": "Replacing the fixed absolute sinusoidal positional encodings with RoPE (Rotary Position Embeddings) and implementing YaRN interpolation to extend effective context window from 512 to 4096 tokens.",
+      "targetedPerformance": "Extend receptive field 8x (512 to 4096 tokens) with zero retraining from scratch, maintaining < 1.0% perplexity drift on retrieval evaluation.",
+      "recommendedTechStack": [
+        "PyTorch",
+        "vLLM",
+        "HuggingFace Transformers",
+        "Llama-Factory"
+      ],
+      "implementationMilestones": [
+        "Milestone 1: Implement rotary 2D complex matrix rotation on query and key projections in custom PyTorch attention module.",
+        "Milestone 2: Implement YaRN frequency interpolation to scale position angles for 8x context extrapolation.",
+        "Milestone 3: Validate retrieval accuracy with the Needle-In-A-Haystack benchmark test suite."
+      ],
+      "resumeBulletPoint": "Implemented Rotary Position Embeddings (RoPE) with YaRN interpolation in PyTorch, expanding effective context length 8x (512 to 4096 tokens) while retaining 99% retrieval accuracy on long-context benchmarks.",
+      "difficultyLevel": "Intermediate",
+      "estimatedWeeks": "3 weeks"
+    }
+  ],
+  "metadata": {
+    "sourceUrl": "https://arxiv.org/abs/1706.03762",
+    "exportedAt": "2026-11-09T08:23:56.388Z",
+    "operationalConstraints": {
+      "tokenEfficiencyEnforced": true,
+      "underConstraint25k": true,
+      "totalEstimatedTokens": 2570
+    }
+  }
+}
